@@ -1,70 +1,148 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System;
+using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using TagLib;
 
 namespace videoplayer1._0
 {
     public partial class MainWindow : Window
-    { 
-        
-        string videoFilePath = "";
-        DispatcherTimer timer;
+    {
+        private string videoFilePath = string.Empty;
+        private string[] videoFiles; // Список видеофайлов в директории
+        private int currentVideoIndex; // Индекс текущего видео
+        private DispatcherTimer timer;
+
         public MainWindow()
         {
             InitializeComponent();
-            timer = new DispatcherTimer();
-            timer.Interval =TimeSpan.FromMilliseconds(100);
+            InitializeTimer();
+            this.KeyDown += MainWindow_KeyDown; // Подписываемся на событие нажатия клавиш
+        }
+
+        private void InitializeTimer()
+        {
+            timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(100)
+            };
             timer.Tick += Timer_Tick;
             timer.Start();
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
         {
-            timeSlider.Value = videoPlayer.Position.TotalMilliseconds;
+            if (videoPlayer.Position.TotalMilliseconds > 0)
+            {
+                timeSlider.Value = videoPlayer.Position.TotalMilliseconds;
+            }
         }
-
-       
 
         private void OpenVideo_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Filter = "Video Files|*.mp4;*.avi;*.mov"
+                Filter = "Видео Файлы|*.mp4;*.avi;*.mov",
+                Multiselect = false // Позволяем выбрать только один файл
             };
 
             if (openFileDialog.ShowDialog() == true)
             {
-                videoPlayer.Source = new Uri(openFileDialog.FileName);
-                videoFilePath = openFileDialog.FileName;
-
-                string fileName = GetFileName(videoFilePath);
-                titleTextBlock.Text = fileName;
-
-                string comment = GetFileComment(videoFilePath);
-                commentTextBlock.Text = comment ?? "Комментарий отсутствует";
-
-                mediaContol();
-                videoPlayer.Play();
-
+                LoadVideo(openFileDialog.FileName);
+                LoadVideoFiles(Path.GetDirectoryName(openFileDialog.FileName)); // Загружаем видеофайлы из директории
             }
         }
 
+        // Загрузка видео по пути
+        private void LoadVideo(string filePath)
+        {
+            videoPlayer.Source = new Uri(filePath);
+            videoFilePath = filePath;
+
+            titleTextBlock.Text = GetFileName(filePath);
+            commentTextBlock.Text = GetFileComment(filePath) ?? "Комментарий отсутствует";
+
+            UpdateMediaControl();
+            videoPlayer.Play();
+        }
+
+        // Загружает все видеофайлы для переходов
+        private void LoadVideoFiles(string directoryPath)
+        {
+            videoFiles = Directory.GetFiles(directoryPath, "*.mp4")
+                .Concat(Directory.GetFiles(directoryPath, "*.avi"))
+                .Concat(Directory.GetFiles(directoryPath, "*.mov"))
+                .ToArray();
+
+            currentVideoIndex = Array.IndexOf(videoFiles, videoFilePath);
+        }
+
+        // Пауза
         private void PauseVideo_Click(object sender, RoutedEventArgs e)
         {
             videoPlayer.Pause();
         }
 
+        // Воспроизведение
         private void PlayVideo_Click(object sender, RoutedEventArgs e)
         {
-            mediaContol();
+            UpdateMediaControl();
             videoPlayer.Play();
         }
 
-        #region getInfo
+        // Переход к предыдущему видео
+        private void LastVideo_Click(object sender, RoutedEventArgs e)
+        {
+            if (videoFiles != null && videoFiles.Length > 0)
+            {
+                currentVideoIndex = (currentVideoIndex - 1 + videoFiles.Length) % videoFiles.Length; // Переход к предыдущему видео
+                LoadVideo(videoFiles[currentVideoIndex]);
+            }
+        }
 
-        public static string GetFileComment(string filePath)
+        // Переход к следующему видео
+        private void NextVideo_Click(object sender, RoutedEventArgs e)
+        {
+            if (videoFiles != null && videoFiles.Length > 0)
+            {
+                currentVideoIndex = (currentVideoIndex + 1) % videoFiles.Length; // Переход к следующему видео
+                LoadVideo(videoFiles[currentVideoIndex]);
+            }
+        }
+
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.S)
+            {
+                if (videoPlayer.SpeedRatio > 0)
+                {
+                    PauseVideo_Click(sender, e);
+                }
+                else
+                {
+                    PlayVideo_Click(sender, e);
+                }
+
+                e.Handled = true;
+            }
+
+            if (e.Key == Key.D)
+            {
+                videoPlayer.Position += TimeSpan.FromSeconds(3); // Перемотка вперед на 3 секунды
+                
+            }
+            else if (e.Key == Key.A)
+            {
+                videoPlayer.Position -= TimeSpan.FromSeconds(3); // Перемотка назад на 3 секунды
+            }
+        }
+
+        #region Получение информации о файле
+
+        private static string GetFileComment(string filePath)
         {
             try
             {
@@ -85,36 +163,40 @@ namespace videoplayer1._0
 
         #endregion
 
+        #region Управление медиа
 
-        #region slider videoControl
-        private void mediaContol()
+        private void UpdateMediaControl()
         {
-            videoPlayer.Volume = (double)volumeSlider.Value;
-            videoPlayer.SpeedRatio = (double)speedSlider.Value;
+            videoPlayer.Volume = volumeSlider.Value;
+            videoPlayer.SpeedRatio = speedSlider.Value;
         }
 
         private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            videoPlayer.Volume = (double)volumeSlider.Value;
+            videoPlayer.Volume = e.NewValue;
         }
+
         private void speedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            videoPlayer.SpeedRatio = (double)speedSlider.Value;
+            videoPlayer.SpeedRatio = e.NewValue;
         }
+
         private void timeSlider_LostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
         {
             videoPlayer.Position = TimeSpan.FromMilliseconds(timeSlider.Value);
             videoPlayer.Play();
             timer.Start();
         }
+
         private void timeSlider_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             videoPlayer.Pause();
             timer.Stop();
         }
+
         #endregion
 
-        #region update info
+        #region Обновление метаданных
 
         private string RenameFile(string newFileName)
         {
@@ -126,19 +208,19 @@ namespace videoplayer1._0
 
             try
             {
-                string directory = System.IO.Path.GetDirectoryName(videoFilePath);
-                string newFilePath = System.IO.Path.Combine(directory, newFileName + System.IO.Path.GetExtension(videoFilePath));
+                string newFilePath = System.IO.Path.Combine(
+                    System.IO.Path.GetDirectoryName(videoFilePath),
+                    $"{newFileName}{System.IO.Path.GetExtension(videoFilePath)}"
+                );
 
-                // Проверяем, существует ли файл с новым именем
                 if (System.IO.File.Exists(newFilePath))
                 {
                     MessageBox.Show("Файл с таким именем уже существует. Пожалуйста, выберите другое имя.");
                     return null;
                 }
 
-                // Переименовываем файл
                 System.IO.File.Move(videoFilePath, newFilePath);
-                return newFilePath; // Возвращаем новый путь к файлу
+                return newFilePath;
             }
             catch (Exception ex)
             {
@@ -158,19 +240,16 @@ namespace videoplayer1._0
             try
             {
                 videoPlayer.Source = null;
-                var videoFile = TagLib.File.Create(videoFilePath);
-                videoFile.Tag.Title = titleTextBox.Text;
-                videoFile.Tag.Comment = commentTextBox.Text;
-                videoFile.Save();
 
-                // Переименовываем файл
+                UpdateFileMetadata(videoFilePath, titleTextBox.Text, commentTextBox.Text);
+
                 string newFilePath = RenameFile(titleTextBox.Text);
 
                 if (newFilePath != null)
                 {
-                    videoFilePath = newFilePath; // Обновляем путь к файлу
+                    videoFilePath = newFilePath;
                     MessageBox.Show("Метаданные успешно обновлены!");
-                    videoPlayer.Source = new Uri(videoFilePath); // Обновляем источник плеера
+                    LoadVideo(videoFilePath);
                 }
             }
             catch (Exception ex)
@@ -178,30 +257,36 @@ namespace videoplayer1._0
                 MessageBox.Show($"Ошибка при записи метаданных: {ex.Message}");
             }
         }
+
+        private void UpdateFileMetadata(string filePath, string title, string comment)
+        {
+            var videoFile = TagLib.File.Create(filePath);
+            videoFile.Tag.Title = title;
+            videoFile.Tag.Comment = comment;
+            videoFile.Save();
+        }
+
         #endregion
 
-
-        private void VideoPlayer_MediaOpened(object sender, RoutedEventArgs e) //размер медиалемента
+        private void VideoPlayer_MediaOpened(object sender, RoutedEventArgs e)
         {
-            mediaContol();
+            UpdateMediaControl();
             timeSlider.Maximum = videoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds;
+            UpdateWindowSize();
+        }
 
-
-
+        private void UpdateWindowSize()
+        {
             var videoWidth = videoPlayer.NaturalVideoWidth;
             var videoHeight = videoPlayer.NaturalVideoHeight;
 
-            // Устанавливаем размеры окна в зависимости от видео
-            this.Width = Math.Max(Math.Min(videoWidth + 50, 1920), 320); // Ограничиваем ширину
-            this.Height = Math.Max(Math.Min(videoHeight + 100, 1080), 240); // Ограничиваем высоту
+            this.Width = Math.Clamp(videoWidth + 50, 320, 1920);
+            this.Height = Math.Clamp(videoHeight + 100, 240, 1080);
         }
 
-
-        private void VideoPlayer_MediaEnded(object sender, RoutedEventArgs e) { 
-        
+        private void VideoPlayer_MediaEnded(object sender, RoutedEventArgs e)
+        {
             videoPlayer.Stop();
         }
-
-        
     }
 }
