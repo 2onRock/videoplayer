@@ -21,6 +21,11 @@ namespace videoplayer1._0
             InitializeComponent();
             InitializeTimer();
             this.KeyDown += MainWindow_KeyDown; // Подписываемся на событие нажатия клавиш
+            // Инициализируем API ключи
+            Utils.ApiConfig.Initialize(
+                youtubeApiKey: "AIzaSyDk4tBCxsIci3YZwo7wVflwW7LE49bowvw",
+                vkToken: "YOUR_VK_TOKEN_HERE" // Замените на ваш токен
+            );
         }
 
         private void InitializeTimer()
@@ -287,6 +292,13 @@ namespace videoplayer1._0
         private void VideoPlayer_MediaEnded(object sender, RoutedEventArgs e)
         {
             videoPlayer.Stop();
+        }
+
+        private void AddVideoToDatabase_Click(object sender, RoutedEventArgs e)
+        {
+            var addVideoWindow = new AddVideoWindow();
+            addVideoWindow.Owner = this;
+            addVideoWindow.ShowDialog();
         }
     }
 }

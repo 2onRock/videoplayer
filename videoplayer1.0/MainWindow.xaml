@@ -4,8 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Video Player" Height="500" Width="800" MaxWidth="1900" Background="#FF1A1A1A" ResizeMode="CanResize"
-        SizeToContent="WidthAndHeight">
+        Title="Video Player" Height="500" Width="1178" 
+        MinWidth="900" MinHeight="500"
+        MaxWidth="1700" MaxHeight="900"
+        Background="{StaticResource PrimaryBackgroundColor}">
 
     <Window.Resources>
         <Style TargetType="MenuItem">
@@ -29,8 +31,8 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" MinWidth="250"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -39,9 +41,10 @@
         </Grid.RowDefinitions>
 
         <!-- Меню -->
-        <Menu Background="Gray" Foreground="White" Grid.Row="0" Grid.ColumnSpan="2">
+        <Menu Grid.ColumnSpan="2" Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Open Video" Click="OpenVideo_Click"/>
+                <MenuItem Header="Add Video to Database" Click="AddVideoToDatabase_Click"/>
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Play" Click="PlayVideo_Click"/>
@@ -51,88 +54,76 @@
         </Menu>
 
         <!-- Информация -->
-        <StackPanel Grid.Row="1" Margin="10">
-            <Border BorderBrush="#FF848484" BorderThickness="2" CornerRadius="2" Margin="0,0,0,10" Padding="10">
-                <StackPanel>
-                    <Label Content="Current Info" HorizontalAlignment="Center"/>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="Title: " />
-                        <TextBlock x:Name="titleTextBlock" VerticalAlignment="Center" />
+        <Border Grid.Row="1" Grid.Column="0" 
+                Background="{StaticResource SecondaryBackgroundColor}" 
+                BorderBrush="{StaticResource BorderColor}" 
+                BorderThickness="0,0,1,0"
+                Padding="10">
+            <StackPanel>
+                <GroupBox Header="Current Info" Margin="0,0,0,10">
+                    <StackPanel>
+                        <Label Content="Title:"/>
+                        <TextBlock x:Name="titleTextBlock" TextWrapping="Wrap" 
+                                 Foreground="{StaticResource TextPrimaryColor}" 
+                                 Margin="5,0,5,10"/>
+                        <Label Content="Comment:"/>
+                        <TextBlock x:Name="commentTextBlock" TextWrapping="Wrap" 
+                                 Foreground="{StaticResource TextPrimaryColor}" 
+                                 Margin="5,0,5,5"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="Comment: " />
-                        <TextBlock x:Name="commentTextBlock" VerticalAlignment="Center" />
+                </GroupBox>
+
+                <GroupBox Header="New Info">
+                    <StackPanel>
+                        <Label Content="Title"/>
+                        <TextBox x:Name="titleTextBox"/>
+                        <Label Content="Comment"/>
+                        <TextBox x:Name="commentTextBox" Height="60" 
+                                TextWrapping="Wrap" AcceptsReturn="True"/>
+                        <Button Content="Save" Click="ReWriteFile_Click" 
+                                HorizontalAlignment="Right" Margin="0,10,0,0"/>
                     </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <Border BorderBrush="#FF848484" BorderThickness="2" Padding="10">
-                <StackPanel>
-                    <Label Content="New Info" HorizontalAlignment="Center"/>
-                    <Grid Margin="0,5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label Content="Title" VerticalAlignment="Center"/>
-                        <TextBox x:Name="titleTextBox" Width="130" HorizontalAlignment="Right"/>
-                    </Grid>
-                    <Grid Margin="0,5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label Content="Comment" VerticalAlignment="Center"/>
-                        <TextBox x:Name="commentTextBox" Width="130" HorizontalAlignment="Right"/>
-                    </Grid>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-
-        <!-- Кнопка Сохранить -->
-        <Button Content="Save" Width="100" HorizontalAlignment="Right" Margin="0,10,10,15" Grid.Row="2" Click="ReWriteFile_Click"/>
+                </GroupBox>
+            </StackPanel>
+        </Border>
 
         <!-- Медиаэлемент -->
-        <StackPanel Grid.Column="1" Grid.RowSpan="2" Margin="10">
+        <Grid Grid.Row="1" Grid.Column="1">
             <MediaElement x:Name="videoPlayer" 
-                      LoadedBehavior="Manual" 
-                      
-                      
-                MinWidth="320"
-                MinHeight="240"
-                MediaOpened="VideoPlayer_MediaOpened"
-                MediaEnded="VideoPlayer_MediaOpened" />
-                
-            <Slider x:Name="timeSlider" Margin="15,5,20,5"
-                    AutoToolTipPlacement="BottomRight"
-                    LostMouseCapture="timeSlider_LostMouseCapture"
-                    PreviewMouseDown="timeSlider_PreviewMouseDown"/>
-            <Label Content="{Binding Path=timeSlider, Source=Value}" Width="200" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                         LoadedBehavior="Manual"
+                         MediaOpened="VideoPlayer_MediaOpened"
+                         MediaEnded="VideoPlayer_MediaOpened"/>
+            
+            <Border VerticalAlignment="Bottom" Background="#80000000" Padding="10">
+                <StackPanel>
+                    <Slider x:Name="timeSlider" Margin="0,0,0,10"
+                            AutoToolTipPlacement="BottomRight"
+                            LostMouseCapture="timeSlider_LostMouseCapture"
+                            PreviewMouseDown="timeSlider_PreviewMouseDown"/>
 
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="⏮" Click="LastVideo_Click" 
+                                    Style="{StaticResource PlayerButtonStyle}"/>
+                            <Button Content="▶" Click="PlayVideo_Click" 
+                                    Style="{StaticResource PlayerButtonStyle}"/>
+                            <Button Content="⏸" Click="PauseVideo_Click" 
+                                    Style="{StaticResource PlayerButtonStyle}"/>
+                            <Button Content="⏭" Click="NextVideo_Click" 
+                                    Style="{StaticResource PlayerButtonStyle}"/>
+                        </StackPanel>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Width="50" Content="Load" Click="OpenVideo_Click" Margin="0,0,10,0"/>
-                <Button Width="50" Content="Last" Click="LastVideo_Click"/>
-                <Button Width="50" Content="Pause" Click="PauseVideo_Click"/>
-                <Button Width="50" Content="Play" Click="PlayVideo_Click"/>
-                <Button Width="50" Content="Next" Click="NextVideo_Click"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,30,0,0">
-                <Label Content="Volume" Margin="20,0,5,0"/>
-                <Slider Width="100" VerticalAlignment="Center" 
-                        Minimum="0" Maximum="1" Value="0.5"
-                        AutoToolTipPlacement="BottomRight" AutoToolTipPrecision="1" 
-                        TickPlacement="BottomRight" TickFrequency="0.1"
-                        x:Name="volumeSlider"
-                        ValueChanged="volumeSlider_ValueChanged"/>
-                <Label Content="Speed" Margin="20,0,0,0"/>
-                <Slider Width="100" VerticalAlignment="Center" HorizontalAlignment="Right"
-                        Minimum="0.5" Maximum="2" Value="1"
-                        AutoToolTipPlacement="BottomRight" AutoToolTipPrecision="1" 
-                        TickPlacement="BottomRight" TickFrequency="0.1"
-                        x:Name="speedSlider"
-                         ValueChanged="speedSlider_ValueChanged"/>
-            </StackPanel>
-        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Label Content="🔊" VerticalAlignment="Center" FontSize="16"/>
+                            <Slider Width="100" Value="0.5" Maximum="1" 
+                                    x:Name="volumeSlider" ValueChanged="volumeSlider_ValueChanged"/>
+                            <Label Content="⚡" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="16"/>
+                            <Slider Width="100" Value="1" Minimum="0.5" Maximum="2"
+                                    x:Name="speedSlider" ValueChanged="speedSlider_ValueChanged"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
