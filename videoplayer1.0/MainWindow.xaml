@@ -9,26 +9,6 @@
         MaxWidth="1700" MaxHeight="900"
         Background="{StaticResource PrimaryBackgroundColor}">
 
-    <Window.Resources>
-        <Style TargetType="MenuItem">
-            <Setter Property="Background" Value="Gray"/>
-            <Setter Property="BorderBrush" Value="Gray"/>
-        </Style>
-        <Style TargetType="Label">
-            <Setter Property="Foreground" Value="#FF848484"/>
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="White"/>
-        </Style>
-        <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#FF848484"/>
-        </Style>
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#FFF9F9F9"/>
-            <Setter Property="Height" Value="20"/>
-        </Style>
-    </Window.Resources>
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300" MinWidth="250"/>
@@ -41,12 +21,12 @@
         </Grid.RowDefinitions>
 
         <!-- Меню -->
-        <Menu Grid.ColumnSpan="2" Grid.Row="0">
-            <MenuItem Header="File">
+        <Menu Grid.ColumnSpan="2" Grid.Row="0" Background="{StaticResource SecondaryBackgroundColor}">
+            <MenuItem Header="File" Foreground="{StaticResource TextPrimaryColor}">
                 <MenuItem Header="Open Video" Click="OpenVideo_Click"/>
                 <MenuItem Header="Add Video to Database" Click="AddVideoToDatabase_Click"/>
             </MenuItem>
-            <MenuItem Header="View">
+            <MenuItem Header="View" Foreground="{StaticResource TextPrimaryColor}">
                 <MenuItem Header="Play" Click="PlayVideo_Click"/>
                 <MenuItem Header="Pause" Click="PauseVideo_Click"/>
                 <MenuItem Header="Restart"/>
@@ -62,11 +42,11 @@
             <StackPanel>
                 <GroupBox Header="Current Info" Margin="0,0,0,10">
                     <StackPanel>
-                        <Label Content="Title:"/>
+                        <Label Content="Title:" Foreground="{StaticResource TextSecondaryColor}"/>
                         <TextBlock x:Name="titleTextBlock" TextWrapping="Wrap" 
                                  Foreground="{StaticResource TextPrimaryColor}" 
                                  Margin="5,0,5,10"/>
-                        <Label Content="Comment:"/>
+                        <Label Content="Comment:" Foreground="{StaticResource TextSecondaryColor}"/>
                         <TextBlock x:Name="commentTextBlock" TextWrapping="Wrap" 
                                  Foreground="{StaticResource TextPrimaryColor}" 
                                  Margin="5,0,5,5"/>
@@ -75,12 +55,14 @@
 
                 <GroupBox Header="New Info">
                     <StackPanel>
-                        <Label Content="Title"/>
-                        <TextBox x:Name="titleTextBox"/>
-                        <Label Content="Comment"/>
+                        <Label Content="Title" Foreground="{StaticResource TextSecondaryColor}"/>
+                        <TextBox x:Name="titleTextBox" Style="{StaticResource BaseTextBoxStyle}"/>
+                        <Label Content="Comment" Foreground="{StaticResource TextSecondaryColor}"/>
                         <TextBox x:Name="commentTextBox" Height="60" 
+                                Style="{StaticResource BaseTextBoxStyle}"
                                 TextWrapping="Wrap" AcceptsReturn="True"/>
                         <Button Content="Save" Click="ReWriteFile_Click" 
+                                Style="{StaticResource BaseButtonStyle}"
                                 HorizontalAlignment="Right" Margin="0,10,0,0"/>
                     </StackPanel>
                 </GroupBox>
@@ -97,6 +79,7 @@
             <Border VerticalAlignment="Bottom" Background="#80000000" Padding="10">
                 <StackPanel>
                     <Slider x:Name="timeSlider" Margin="0,0,0,10"
+                            Style="{StaticResource BaseSliderStyle}"
                             AutoToolTipPlacement="BottomRight"
                             LostMouseCapture="timeSlider_LostMouseCapture"
                             PreviewMouseDown="timeSlider_PreviewMouseDown"/>
@@ -114,11 +97,16 @@
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Label Content="🔊" VerticalAlignment="Center" FontSize="16"/>
+                            <Label Content="🔊" VerticalAlignment="Center" 
+                                   FontSize="16" Foreground="{StaticResource TextPrimaryColor}"/>
                             <Slider Width="100" Value="0.5" Maximum="1" 
+                                    Style="{StaticResource BaseSliderStyle}"
                                     x:Name="volumeSlider" ValueChanged="volumeSlider_ValueChanged"/>
-                            <Label Content="⚡" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="16"/>
+                            <Label Content="⚡" VerticalAlignment="Center" 
+                                   Margin="10,0,0,0" FontSize="16" 
+                                   Foreground="{StaticResource TextPrimaryColor}"/>
                             <Slider Width="100" Value="1" Minimum="0.5" Maximum="2"
+                                    Style="{StaticResource BaseSliderStyle}"
                                     x:Name="speedSlider" ValueChanged="speedSlider_ValueChanged"/>
                         </StackPanel>
                     </Grid>

@@ -64,6 +64,42 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Базовый стиль для TextBox -->
+    <Style x:Key="BaseTextBoxStyle" TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource SecondaryBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryColor}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8,5"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="border" 
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="3">
+                        <ScrollViewer x:Name="PART_ContentHost" 
+                                    Focusable="False" 
+                                    Padding="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.6"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Стиль для TextBox -->
     <Style TargetType="TextBox">
         <Setter Property="Background" Value="{StaticResource SecondaryBackgroundColor}"/>
@@ -233,15 +269,93 @@
     <!-- Стиль для GroupBox -->
     <Style TargetType="GroupBox">
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextSecondaryColor}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryColor}"/>
         <Setter Property="Padding" Value="10"/>
-        <Setter Property="Margin" Value="0,10"/>
+        <Setter Property="Margin" Value="0,5"/>
     </Style>
 
     <!-- Стиль для MediaElement -->
     <Style TargetType="MediaElement">
         <Setter Property="Stretch" Value="Uniform"/>
         <Setter Property="LoadedBehavior" Value="Manual"/>
+    </Style>
+
+    <!-- Базовый стиль для Slider -->
+    <Style x:Key="BaseSliderStyle" TargetType="Slider">
+        <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+        <Setter Property="Background" Value="{StaticResource BorderColor}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Track x:Name="PART_Track" Grid.Row="1">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge">
+                                    <RepeatButton.Style>
+                                        <Style TargetType="RepeatButton">
+                                            <Setter Property="SnapsToDevicePixels" Value="True"/>
+                                            <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="RepeatButton">
+                                                        <Border Height="4" 
+                                                                CornerRadius="2" 
+                                                                Background="{StaticResource AccentColor}"/>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </RepeatButton.Style>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge">
+                                    <RepeatButton.Style>
+                                        <Style TargetType="RepeatButton">
+                                            <Setter Property="SnapsToDevicePixels" Value="True"/>
+                                            <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="RepeatButton">
+                                                        <Border Height="4"
+                                                                CornerRadius="2"
+                                                                Background="{StaticResource BorderColor}"/>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </RepeatButton.Style>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Style>
+                                        <Style TargetType="Thumb">
+                                            <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Grid>
+                                                            <Ellipse Width="12" Height="12" 
+                                                                     Fill="{StaticResource AccentColor}"/>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Thumb.Style>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- Стиль для Slider -->
@@ -260,20 +374,16 @@
     <Style TargetType="Menu">
         <Setter Property="Background" Value="{StaticResource SecondaryBackgroundColor}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryColor}"/>
-        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
     </Style>
 
     <!-- Стиль для MenuItem -->
     <Style TargetType="MenuItem">
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="{StaticResource SecondaryBackgroundColor}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryColor}"/>
+        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="10,5"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource AccentColor}"/>
-            </Trigger>
-            <Trigger Property="IsSubmenuOpen" Value="True">
                 <Setter Property="Background" Value="{StaticResource AccentColor}"/>
             </Trigger>
         </Style.Triggers>
