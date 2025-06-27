@@ -119,7 +119,6 @@ namespace videoplayer1._0.Utils
 
                 if (string.IsNullOrEmpty(ApiConfig.YouTubeApiKey))
                 {
-                    // Если API ключ не установлен, используем oEmbed
                     string embedUrl = $"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={videoId}&format=json";
                     var embedResponse = await client.GetStringAsync(embedUrl);
                     using (JsonDocument document = JsonDocument.Parse(embedResponse))
