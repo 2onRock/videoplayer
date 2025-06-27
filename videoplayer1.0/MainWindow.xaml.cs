@@ -20,11 +20,10 @@ namespace videoplayer1._0
         {
             InitializeComponent();
             InitializeTimer();
-            this.KeyDown += MainWindow_KeyDown; // Подписываемся на событие нажатия клавиш
-            // Инициализируем API ключи
+            this.KeyDown += MainWindow_KeyDown; 
+
             Utils.ApiConfig.Initialize(
-                youtubeApiKey: "AIzaSyDk4tBCxsIci3YZwo7wVflwW7LE49bowvw",
-                vkToken: "YOUR_VK_TOKEN_HERE" // Замените на ваш токен
+                youtubeApiKey: "AIzaSyDk4tBCxsIci3YZwo7wVflwW7LE49bowvw"
             );
         }
 

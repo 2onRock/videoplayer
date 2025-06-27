@@ -4,7 +4,7 @@ namespace videoplayer1._0.Database
 {
     public class DatabaseConnection
     {
-        private static string ConnectionString = "Host=metro.proxy.rlwy.net;Port=35455;Database=railway;Username=postgres;Password=fyoKQNoCGyItrexFxTKvgKxIHLvrRGOd";
+        private static string ConnectionString = "Host=ballast.proxy.rlwy.net;Port=43701;Database=railway;Username=postgres;Password=BuuEdOQvXRKjsgnTcYleqqxUtRZBiYNZ";
 
         public static NpgsqlConnection GetConnection()
         {
